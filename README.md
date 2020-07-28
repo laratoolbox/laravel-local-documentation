@@ -40,6 +40,6 @@ laravel-doc() {
 
 After adding `laravel-doc` function to `.bashrc` file you may write laravel-doc to terminal and it will open browser tab.
 
-Here is the example output.
+Here is the screenshot.
 
 ![Screenshot](ss.png)
