@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Laravel Docs! | Local</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css"> -->
+  <!-- <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-cg6SkqEOCV1NbJoCu11+bm0NvBRc8IYLRGXkmNrqUBfTjmMYwNKPWBTIKyw9mHNJ" crossorigin="anonymous"> -->
+  <!-- <link rel="stylesheet" href="https://unpkg.com/chota@latest"> -->
+  <link rel="stylesheet" href="https://unpkg.com/chota@0.8.0/dist/chota.min.css">
+
+  <style>
+    h2,
+    h3,
+    h4 {
+      margin-top: 50px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-10">
+        <h1>
+          <a href="/">Laravel Local Documentation</a>
+        </h1>
+      </div>
+      <div class="col-2">
+        <div class="card" style="position: fixed; right: 0;">
+          <select id="versions" onchange="setVersion(this.value)">
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3 card">
+        <input type="text" id="search" onkeyup="filterSidebar(this.value)">
+        <div id="menu">
+        </div>
+      </div>
+      <div class="col-7">
+        <div id="content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const UrlParams = new URLSearchParams(window.location.search);
+
+    var CONTENT_LOAD_TIMEOUT = 200;
+    var SELECTED_VERSION = UrlParams.get('version') || 'master';
+    var SELECTED_DOCUMENT = UrlParams.get('page') || '';
+    var FILES = JSON.parse(httpGet('files.txt'));
+
+    buildSidebar();
+    buildVersionsDropdown();
+    buildContent();
+
+    function setContent(name) {
+      SELECTED_DOCUMENT = name;
+      buildContent();
+      buildSidebar();
+    }
+
+    function setVersion(version) {
+      SELECTED_VERSION = version;
+      buildContent();
+      buildSidebar();
+    }
+
+    function buildVersionsDropdown() {
+      let versionHtml = '';
+
+      for (Version of Object.keys(FILES)) {
+        versionHtml += `
+          <option ${SELECTED_VERSION == Version ? 'selected' : ''}>
+            ${Version}
+          </option>
+        `;
+      }
+
+      document.getElementById('versions').innerHTML = versionHtml;
+    }
+
+    function buildSidebar() {
+      document.getElementById('menu').innerHTML = '';
+
+      setTimeout(() => {
+        let sidebarHtml = '';
+
+        for (File of FILES[SELECTED_VERSION]) {
+          if (File !== '') {
+            sidebarHtml += `
+                <li>
+                  <a href="javascript:;" onclick="setContent('${File}')">${File}</a>
+                </li>
+              `;
+          }
+        }
+
+        document.getElementById('menu').innerHTML = `<ul>${sidebarHtml}</ul>`;
+
+        filterSidebar(document.getElementById('search').value);
+      }, CONTENT_LOAD_TIMEOUT);
+    }
+
+    function filterSidebar(search) {
+      for (el of document.getElementById('menu').getElementsByTagName("li")) {
+        if (!el.innerText.includes(search)) {
+          el.style = 'display: none'
+        } else {
+          el.style = 'display: block'
+        }
+      }
+    }
+
+    function buildContent() {
+      document.getElementById('content').innerHTML = '';
+
+      if (SELECTED_VERSION && SELECTED_DOCUMENT) {
+        const PageData = httpGet('docs/' + SELECTED_VERSION + '/' + SELECTED_DOCUMENT);
+
+        history.replaceState(
+          {},
+          undefined,
+          '?version=' + SELECTED_VERSION + '&page=' + SELECTED_DOCUMENT
+        )
+
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+
+        setTimeout(() => {
+          document.getElementById('content').innerHTML = marked(
+            PageData
+              .replace(/{note}/g, '**[NOTE]**')
+              .replace(/{tip}/g, '**[TIP]**')
+          );
+        }, CONTENT_LOAD_TIMEOUT);
+      }
+    }
+
+    function httpGet(url) {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open('GET', url, false);
+      xmlHttp.send(null);
+
+      if (xmlHttp.status !== 200) {
+        console.log(xmlHttp);
+        return `"${SELECTED_VERSION}/${SELECTED_DOCUMENT}" **Not found** !`;
+      }
+
+      return xmlHttp.responseText;
+    }
+  </script>
+</body>
+
+</html>
