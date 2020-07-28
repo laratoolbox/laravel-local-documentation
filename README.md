@@ -2,7 +2,7 @@
 
 This repo contains code that i am using for keeping track of laravel documentation changes and seeing these changes locally.
 
-> If you want to build whole laravel documentation website you need to clone [laravel/laravel.com-next](https://github.com/laravel/laravel.com-next) also you should follow theirs readme file for installing locally.
+> If you want to build whole laravel documentation website locally you need to clone [laravel/laravel.com-next](https://github.com/laravel/laravel.com-next) also you should follow their readme file where all installation steps written.
 
 ---
 
