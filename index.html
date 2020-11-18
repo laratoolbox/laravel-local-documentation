@@ -53,7 +53,7 @@
     const UrlParams = new URLSearchParams(window.location.search);
 
     var CONTENT_LOAD_TIMEOUT = 200;
-    var SELECTED_VERSION = UrlParams.get('version') || 'master';
+    var SELECTED_VERSION = UrlParams.get('version') || '8.x';
     var SELECTED_DOCUMENT = UrlParams.get('page') || '';
     var FILES = JSON.parse(httpGet('files.txt'));
 
