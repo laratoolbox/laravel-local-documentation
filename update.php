@@ -5,6 +5,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 $versions = [
+    '10.x',
     '9.x',
     '8.x',
     '7.x',
